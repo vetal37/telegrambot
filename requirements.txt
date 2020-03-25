@@ -1,0 +1,4 @@
+telegram
+Flask==1.1.1
+requests==2.23.0
+python-telegram-bot==12.4.2
