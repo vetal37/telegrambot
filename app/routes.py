@@ -1,9 +1,9 @@
-from app import app, config, db
+from app import app, db
 import telebot
 from telebot import types
 import time
-from app.models import *
-from flask import session
+from app.models import Student, Teacher, Table
+from flask import request
 # import httplib2
 # import googleapiclient.discovery
 # from oauth2client.service_account import ServiceAccountCredentials
@@ -75,7 +75,7 @@ def teacher_table_link_step(message):
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
 
 
-def teacher_table_name_step(message):
+def teacher_table_name_step(message, link):
     try:
         chat_id = message.chat.id
         name = message.text
@@ -108,7 +108,7 @@ def student_name_step(message):
 def student_phone_step(message):
     chat_id = message.chat.id
     student_phone = message.contact.phone_number
-    user = Student.query.filter_by(id=chat_id).first().update({'phone': student_phone})
+    Student.query.filter_by(id=chat_id).first().update({'phone': student_phone})
     db.session.commit()
     bot.send_message(chat_id, text='Завершено успешно')
     
