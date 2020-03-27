@@ -3,6 +3,7 @@ from app import config
 import telebot
 from telebot import types
 import time
+from app.models import *
 # import httplib2
 # import googleapiclient.discovery
 # from oauth2client.service_account import ServiceAccountCredentials
@@ -12,7 +13,7 @@ import time
 # ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive'])
 
 # httpAuth = credentials.authorize(httplib2.Http()) # Авторизуемся в системе
-# service = googleapiclient.discovery.build('sheets', 'v4', http = httpAuth) # Выбираем работу с таблицами и 4 версию API
+# service = googleapiclient.discovery.build('sheets', 'v4', http=httpAuth) # Выбираем работу с таблицами и 4 версию API
 
 
 @app.route('/')
