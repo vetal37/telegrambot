@@ -1,9 +1,9 @@
-from app import app
-from app import config
+from app import app, config, db
 import telebot
 from telebot import types
 import time
 from app.models import *
+from flask import session
 # import httplib2
 # import googleapiclient.discovery
 # from oauth2client.service_account import ServiceAccountCredentials
@@ -56,62 +56,61 @@ def teacher_name_step(message):
     try:
         chat_id = message.chat.id
         name = message.text
-        teacher = Teacher_data(name)
-        teacher_dict[chat_id] = teacher
-        teacher_dict.teacher_id = chat_id
+        teacher = Teacher(id=chat_id, name=name)
+        db.session.add(teacher)
+        db.session.commit()
         msg = bot.send_message(chat_id, text='Введите ссылку на таблицу Google')
         bot.register_next_step_handler(msg, teacher_table_link_step)
     except Exception as e:
-        bot.reply_to(message, "Не понял Вас")
+        bot.reply_to(message, "Произошла какая-то ошибка, я вас не понял")
 
 
 def teacher_table_link_step(message):
     try:
         chat_id = message.chat.id
         link = message.text
-        teacher = teacher_dict[chat_id]
-        teacher.table_link = link
         msg = bot.send_message(chat_id, text='Введите, как таблица будет называться в боте')
-        bot.register_next_step_handler(msg, teacher_table_name_step)
+        bot.register_next_step_handler(msg, teacher_table_name_step, link)
     except Exception as e:
-        bot.reply_to(message, 'Не понял Вас')
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
 
 
 def teacher_table_name_step(message):
     try:
         chat_id = message.chat.id
         name = message.text
-        teacher = teacher_dict[chat_id]
-        teacher.table_name = name
+        table = Table(url=link, user_id=chat_id, list_name=name)
+        db.session.add(table)
+        db.session.commit()
         msg = bot.send_message(chat_id, text='Принято')
     except Exception as e:
-        bot.reply_to(message, 'Не понял Вас')
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
 
 
 def student_name_step(message):
     try:
         chat_id = message.chat.id
         name = message.text
-        student = Student_data(name)
-        student_dict[chat_id] = student
-        student_dict.student_id = chat_id
+        student = Student(id=chat_id, name=name)
+        db.session.add(student)
+        db.session.commit()
         keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
         agree = types.KeyboardButton(text='Да, я хочу передать свой телефон', request_contact=True)
         decline = types.KeyboardButton(text='Нет, я не хочу передавать свой телефон')
         keyboard.add(agree)
         keyboard.add(decline)
-        bot.send_message(chat_id, text = 'Хотите передать свой номер телефона?', reply_markup=keyboard)
+        bot.send_message(chat_id, text='Хотите передать свой номер телефона?', reply_markup=keyboard)
     except Exception as e:
-        bot.reply_to(message, 'Не понял Вас')
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
+
 
 @bot.message_handler(content_types=['contact'])
 def student_phone_step(message):
     chat_id = message.chat.id
-    student_phone_contact = message.contact.phone_number
-    student = Student_data(chat_id)
-    student_dict[chat_id] = student
-    student_dict.student_phone = student_phone_contact
-    bot.send_message(chat_id, text = 'Завершено успешно')
+    student_phone = message.contact.phone_number
+    user = Student.query.filter_by(id=chat_id).first().update({'phone': student_phone})
+    db.session.commit()
+    bot.send_message(chat_id, text='Завершено успешно')
     
     
 bot.enable_save_next_step_handlers(delay=2)

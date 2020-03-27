@@ -11,7 +11,7 @@ class Teacher(db.Model):
         return f"Teacher('{self.id}', '{self.name}')"
 
 
-class Tables(db.Model):
+class Table(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey('teacher.id'), nullable=False)
     list_name = db.Column(db.String(80))
