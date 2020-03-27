@@ -1,41 +1,119 @@
 from flask import Flask, request
-import telegram
-from bot.config import bot_token, bot_user_name, URL
-from bot.suka import get_response
+import telebot
+from telebot import types
+import time
+#import httplib2 
+#import googleapiclient.discovery
+#from oauth2client.service_account import ServiceAccountCredentials	
 
-global bot
-global TOKEN
-TOKEN = bot_token
-bot = telegram.Bot(token=TOKEN)
+secret = "960088688:AAGVD9I_T8TO1oW0L3H9NQyKIjyPpYU6ZZE"
+bot = telebot.TeleBot('960088688:AAGVD9I_T8TO1oW0L3H9NQyKIjyPpYU6ZZE', threaded=False)
+#CREDENTIALS_FILE = 'woven-environs-272314-a2f4d17f757a.json'
+
+#credentials = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive'])
+
+#httpAuth = credentials.authorize(httplib2.Http()) # Авторизуемся в системе
+#service = googleapiclient.discovery.build('sheets', 'v4', http = httpAuth) # Выбираем работу с таблицами и 4 версию API 
+
+bot.remove_webhook()
+time.sleep(1)
+bot.set_webhook(url="https://vetal37.pythonanywhere.com/{}".format(secret))
 
 app = Flask(__name__)
 
+teacher_dict = {}
+student_dict = {}
 
-@app.route('/{}'.format(TOKEN), methods=['POST'])
-def respond():
-    update = telegram.Update.de_json(request.get_json(force=True), bot)
-    chat_id = update.message.chat.id
-    msg_id = update.message.message_id
-    text = update.message.text.encode('utf-8').decode()
-    print("got text message :", text)
-    response = get_response(text)
-    bot.sendMessage(chat_id=chat_id, text=response, reply_to_message_id=msg_id)
-    return 'ok'
+class Teacher_data:
+    def __init__(self, name):
+        self.teacher_name = name
+        self.teacher_id = None
+        self.table_link = None
+        self.table_name = None
+        
+class Student_data:
+    def __init__(self, name):
+        self.student_name = name
+        self.student_id = None
+        self.student_phone = None
 
-
-@app.route('/setwebhook', methods=['GET', 'POST'])
-def set_webhook():
-    s = bot.setWebhook('{URL}{HOOK}'.format(URL=URL, HOOK=TOKEN))
-    if s:
-        return "webhook setup ok"
-    else:
-        return "webhook setup failed"
-
-
-@app.route('/')
-def index():
-    return '.'
+@app.route('/{}'.format(secret), methods=["POST"])
+def webhook():
+    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+    print("Message")
+    return "ok", 200
 
 
-if __name__ == '__main__':
-    app.run(threaded=True)
+@bot.message_handler(content_types=['text'])
+def startCommand(message):
+    if message.text == "/start":
+        keyboard = types.InlineKeyboardMarkup()
+        callback_button_teacher = types.InlineKeyboardButton(text="Я преподаватель", callback_data="teacher")
+        callback_button_student = types.InlineKeyboardButton(text="Я студент", callback_data="student")
+        keyboard.add(callback_button_teacher)
+        keyboard.add(callback_button_student)
+        bot.send_message(message.chat.id, text='Выберите роль', reply_markup=keyboard)
+        
+
+@bot.callback_query_handler(func = lambda call: True)
+def callback_inline(call):
+    if call.message:
+        if call.data == "teacher":
+            #keyboard = types.InlineKeyboardMarkup()
+            bot.send_message(chat_id=call.message.chat.id, text='Представьтесь, пожалуйста')
+            bot.register_next_step_handler(message, teacher_name_step)
+        elif call.data == "student":
+            bot.send_message(chat_id=call.message.chat.id, text='Представьтесь, пожалуйста')
+            bot.register_next_step_handler(message, student_name_step)
+
+def teacher_name_step(message):
+    try:
+        chat_id = message.chat.id
+        name = message.text
+        teacher = Teacher_data(name)
+        teacher_dict[chat_id] = teacher
+        teacher_dict.teacher_id = chat_id
+        msg = bot.send_message(chat_id, text='Введите ссылку на таблицу Google')
+        bot.register_next_step_handler(msg, teacher_table_link_step)
+    except Exception as e:
+        bot.reply_to(message, "Не понял Вас")
+
+def teacher_table_link_step(message):
+    try:
+        chat_id = message.chat.id
+        link = message.text
+        teacher = teacher_dict[chat_id]
+        teacher.table_link = link
+        msg = bot.send_message(chat_id, text = 'Введите, как таблица будет называться в боте')
+        bot.register_next_step_handler(msg, teacher_table_name_step)
+    except Exception as e:
+        bot.reply_to(message, 'Не понял Вас')
+
+def teacher_table_name_step(message):
+    try:
+        chat_id = message.chat.id
+        name = message.text
+        teacher = teacher_dict[chat_id]
+        teacher.table_name = name
+        msg = bot.send_message(chat_id, text = 'Принято')
+    except Exception as e:
+        bot.reply_to(message, 'Не понял Вас')
+
+def student_name_step(message):
+    try:
+        chat_id = message.chat.id
+        name = message.text
+        student = Student_data(name)
+        student_dict[chat_id] = student
+        student_dict.student_id = chat_id
+        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True)
+        keyboard.add('')
+        msg = bot.send_message(chat_id, text = 'Хотите передать свой номер телефона?')
+        bot.register_next_step_handler(msg, student_phone_step)
+    except Exception as e:
+        bot.reply_to(message, 'Не понял Вас')
+
+def student_phone_step(message):
+    try:
+        chat_id = message.chat.id
+        keyboard = 
