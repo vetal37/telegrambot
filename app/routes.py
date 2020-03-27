@@ -111,3 +111,8 @@ def student_phone_step(message):
     student_dict[chat_id] = student
     student_dict.student_phone = student_phone_contact
     bot.send_message(chat_id, text = 'Завершено успешно')
+    
+    
+bot.enable_save_next_step_handlers(delay=2)
+
+bot.load_next_step_handlers()
