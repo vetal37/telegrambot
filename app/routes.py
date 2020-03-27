@@ -1,6 +1,8 @@
-from app import app, db
+from app import bot, db
+from app.config import Config
 import telebot
 from telebot import types
+from flask import request, current_app as app
 import time
 from app.models import Student, Teacher, Table
 from flask import request
@@ -16,13 +18,12 @@ from flask import request
 # service = googleapiclient.discovery.build('sheets', 'v4', http=httpAuth) # Выбираем работу с таблицами и 4 версию API
 
 
-@app.route('/')
-@app.route('/index')
-def index():
-    return render_template('index.html')
+@app.route('/test', methods=["GET"])
+def dasdsa():
+    return '<h1>200</h1>'
 
 
-@app.route('/{}'.format(secret), methods=["POST"])
+@app.route('/{}'.format(Config.secret), methods=["POST"])
 def web_hook():
     bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
     print("Message")
