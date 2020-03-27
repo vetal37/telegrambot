@@ -94,14 +94,20 @@ def student_name_step(message):
         student = Student_data(name)
         student_dict[chat_id] = student
         student_dict.student_id = chat_id
-        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True)
-        keyboard.add('')
-        msg = bot.send_message(chat_id, text='Хотите передать свой номер телефона?')
-        bot.register_next_step_handler(msg, student_phone_step)
+        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
+        agree = types.KeyboardButton(text='Да, я хочу передать свой телефон', request_contact=True)
+        decline = types.KeyboardButton(text='Нет, я не хочу передавать свой телефон')
+        keyboard.add(agree)
+        keyboard.add(decline)
+        bot.send_message(chat_id, text = 'Хотите передать свой номер телефона?', reply_markup=keyboard)
     except Exception as e:
         bot.reply_to(message, 'Не понял Вас')
 
-# def student_phone_step(message):
-#     try:
-#         chat_id = message.chat.id
-#         keyboard =
+@bot.message_handler(content_types=['contact'])
+def student_phone_step(message):
+    chat_id = message.chat.id
+    student_phone_contact = message.contact.phone_number
+    student = Student_data(chat_id)
+    student_dict[chat_id] = student
+    student_dict.student_phone = student_phone_contact
+    bot.send_message(chat_id, text = 'Завершено успешно')
