@@ -73,7 +73,6 @@ def callback_inline(call):
             bot.register_next_step_handler(call.message, teacher_start_test_step)
 
 
-
 def teacher_name_step(message):
     try:
         chat_id = message.chat.id
@@ -133,7 +132,7 @@ def teacher_delete_table_step1(message):
     try:
         chat_id = message.chat.id
         keyboard = types.InlineKeyboardMarkup()
-        for i in Tables.query.filter_by(user_id=chat_id).all():
+        for i in Tables.query.filter_by(Tables.user_id == str(chat_id)).all():
             keyboard.add(types.InlineKeyboardButton(text="i", callback_data="delete2"))
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
@@ -143,7 +142,7 @@ def teacher_delete_table_step2(message):
     try:
         chat_id = message.chat.id
         text = message.text
-        msg = bot.send_message(chat_id, text='Таблица ' + text +'удалена')
+        msg = bot.send_message(chat_id, text='Таблица ' + text + ' удалена')
         bot.register_next_step_handler(msg, teacher_table_name_step, link, True)
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
@@ -182,7 +181,9 @@ def student_name_step(message):
 def student_phone_step(message):
     chat_id = message.chat.id
     student_phone = message.contact.phone_number
-    Student.query.filter_by(id=chat_id).first().update({'phone': student_phone})
+    phone = Student.query.filter(Student.id == str(chat_id)).first()
+    phone.state = student_phone
+    db.session.flush()
     db.session.commit()
     bot.send_message(chat_id, text='Завершено успешно')
 
