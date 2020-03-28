@@ -133,7 +133,7 @@ def teacher_delete_table_step1(message):
     try:
         chat_id = message.chat.id
         keyboard = types.InlineKeyboardMarkup()
-        for i in Tables.query.filter_by(user_id=chat_id):
+        for i in Tables.query.filter_by(user_id=chat_id).all():
             keyboard.add(types.InlineKeyboardButton(text="i", callback_data="delete2"))
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
