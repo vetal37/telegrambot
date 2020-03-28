@@ -28,6 +28,7 @@ def web_hook():
     if request.headers.get('content-type') == 'application/json':
         json_string = flask.request.get_data().decode('utf-8')
         update = telebot.types.Update.de_json(json_string)
+        time.sleep(0.6)
         bot.process_new_updates([update])
         return ''
     else:
