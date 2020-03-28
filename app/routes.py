@@ -50,6 +50,8 @@ def start_command(message):
         keyboard.add(callback_button_teacher)
         keyboard.add(callback_button_student)
         bot.send_message(message.chat.id, text='Выберите роль', reply_markup=keyboard)
+    elif message.text == "Нет, я не хочу передавать свой телефон":
+        bot.send_message(message.chat.id, text='Чтобы узнать о всех возможностях бота, посещайте пары')
 
 
 @bot.callback_query_handler(func=lambda call: True)
