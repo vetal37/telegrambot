@@ -1,8 +1,8 @@
 class Config:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-    bot_token = "960088688:AAGVD9I_T8TO1oW0L3H9NQyKIjyPpYU6ZZE"
-    bot_user_name = "test3712356136_bot"
+    bot_token = "923740922:AAE3amdrgc6GGdBC-EkQRHGGF2BJGzCMu_E"
+    bot_user_name = "nejlfnejanfak1546466468bot"
     URL = "https://fathomless-headland-73674.herokuapp.com/"
     # service_email = "acc-491@woven-environs-272314.iam.gserviceaccount.com"
-    secret = "960088688:AAGVD9I_T8TO1oW0L3H9NQyKIjyPpYU6ZZE"
+    secret = "923740922:AAE3amdrgc6GGdBC-EkQRHGGF2BJGzCMu_E"
