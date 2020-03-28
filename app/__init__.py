@@ -7,7 +7,7 @@ import time
 
 db = SQLAlchemy()
 bot = telebot.TeleBot(Config.secret, threaded=False)
-# bot.remove_webhook()
+bot.remove_webhook()
 
 
 def create_app(config_class=Config):
