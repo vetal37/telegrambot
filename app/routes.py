@@ -4,7 +4,7 @@ import telebot
 from telebot import types
 from flask import request, current_app as app
 import time
-from app.models import Student, Teacher, Table
+from app.models import Student, Teacher, Tables
 from flask import request
 # import httplib2
 # import googleapiclient.discovery
@@ -84,7 +84,7 @@ def teacher_table_name_step(message, link):
     try:
         chat_id = message.chat.id
         name = message.text
-        table = Table(url=link, user_id=chat_id, list_name=name)
+        table = Tables(url=link, user_id=chat_id, list_name=name)
         db.session.add(table)
         db.session.commit()
         msg = bot.send_message(chat_id, text='Принято')
