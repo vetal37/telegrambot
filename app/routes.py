@@ -18,19 +18,22 @@ from flask import request
 # service = googleapiclient.discovery.build('sheets', 'v4', http=httpAuth) # Выбираем работу с таблицами и 4 версию API
 
 
-@app.route('/test', methods=["GET"])
-def dasdsa():
-    return '<h1>200</h1>'
+@app.route('/')
+def webhook():
+    try:
+        bot.remove_webhook()
+        time.sleep(1)
+        bot.set_webhook(Config.URL + Config.secret)
+    except Exception as e:
+        return "Ошибка ", e
+    return "!", 200
 
 
 @app.route('/{}'.format(Config.secret), methods=["POST"])
 def web_hook():
     if request.headers.get('content-type') == 'application/json':
-        json_string = flask.request.get_data().decode('utf-8')
-        update = telebot.types.Update.de_json(json_string)
-        time.sleep(0.6)
-        bot.process_new_updates([update])
-        return ''
+        bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+        return "!", 200
     else:
         flask.abort(403)
 
