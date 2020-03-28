@@ -105,6 +105,7 @@ def teacher_table_name_step(message, link):
         db.session.add(table)
         db.session.commit()
         msg = bot.send_message(chat_id, text='Принято')
+        bot.register_next_step_handler(msg, teacher_start_test_step())
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
 
