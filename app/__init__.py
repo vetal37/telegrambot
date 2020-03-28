@@ -19,10 +19,9 @@ def create_app(config_class=Config):
         from app import routes
         db.create_all()
 
-    time.sleep(0.1)
+    time.sleep(10)
 
     bot.set_webhook(Config.URL + Config.secret)
     migrate = Migrate(app, db)
-
 
     return app
