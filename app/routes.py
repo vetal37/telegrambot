@@ -25,9 +25,13 @@ def dasdsa():
 
 @app.route('/{}'.format(Config.secret), methods=["POST"])
 def web_hook():
-    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
-    print("Message")
-    return "ok", 200
+    if request.headers.get('content-type') == 'application/json':
+        json_string = flask.request.get_data().decode('utf-8')
+        update = telebot.types.Update.de_json(json_string)
+        bot.process_new_updates([update])
+        return ''
+    else:
+        flask.abort(403)
 
 
 @bot.message_handler(content_types=['text'])
