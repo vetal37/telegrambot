@@ -3,6 +3,7 @@ from app import db
 
 
 class Teacher(db.Model):
+    __name__ = 'teacher'
     id = db.Column(db.Integer, primary_key=True, unique=True)
     name = db.Column(db.String(80))
 
@@ -10,7 +11,8 @@ class Teacher(db.Model):
         return f"Teacher('{self.id}', '{self.name}')"
 
 
-class Table(db.Model):
+class Tables(db.Model):
+    __name__ = 'tables'
     id = db.Column(db.Integer, primary_key=True, unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey('teacher.id'), nullable=False)
     list_name = db.Column(db.String(80))
@@ -21,6 +23,7 @@ class Table(db.Model):
 
 
 class Student(db.Model):
+    __name__ = 'student'
     id = db.Column(db.Integer, primary_key=True, unique=True)
     name = db.Column(db.String(80))
     phone = db.Column(db.String(20))
