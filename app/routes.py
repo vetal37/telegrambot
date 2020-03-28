@@ -6,6 +6,9 @@ from flask import request, current_app as app
 import time
 from app.models import Student, Teacher, Tables
 from flask import request
+import re
+
+
 # import httplib2
 # import googleapiclient.discovery
 # from oauth2client.service_account import ServiceAccountCredentials
@@ -74,12 +77,22 @@ def teacher_name_step(message):
         bot.reply_to(message, "Произошла какая-то ошибка, я вас не понял")
 
 
+def find_url(string):
+    url = re.findall("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+] |"
+                     " [! * \(\),] | (?: %[0-9a-fA-F][0-9a-fA-F]))+", string)
+    return url
+
+
 def teacher_table_link_step(message):
     try:
         chat_id = message.chat.id
         link = message.text
-        msg = bot.send_message(chat_id, text='Введите, как таблица будет называться в боте')
-        bot.register_next_step_handler(msg, teacher_table_name_step, link)
+        try:
+            link = find_url(link)[0]
+            msg = bot.send_message(chat_id, text='Введите, как таблица будет называться в боте')
+            bot.register_next_step_handler(msg, teacher_table_name_step, link)
+        except IndexError:
+            bot.reply_to(message, 'Введите правильную ссылку на таблицу')
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
 
@@ -120,8 +133,8 @@ def student_phone_step(message):
     Student.query.filter_by(id=chat_id).first().update({'phone': student_phone})
     db.session.commit()
     bot.send_message(chat_id, text='Завершено успешно')
-    
-    
+
+
 bot.enable_save_next_step_handlers(delay=2)
 
 bot.load_next_step_handlers()
