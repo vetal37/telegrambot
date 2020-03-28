@@ -7,7 +7,7 @@ import time
 
 db = SQLAlchemy()
 bot = telebot.TeleBot(Config.secret, threaded=False)
-bot.remove_webhook()
+# bot.remove_webhook()
 
 
 def create_app(config_class=Config):
@@ -18,7 +18,7 @@ def create_app(config_class=Config):
     with app.app_context():
         db.create_all()
 
-    time.sleep(1)
+    time.sleep(2)
 
     bot.set_webhook(Config.URL.format(Config.secret))
     migrate = Migrate(app, db)
