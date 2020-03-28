@@ -51,19 +51,27 @@ def start_command(message):
         keyboard.add(callback_button_student)
         bot.send_message(message.chat.id, text='Выберите роль', reply_markup=keyboard)
     elif message.text == "Нет, я не хочу передавать свой телефон":
-        bot.send_message(message.chat.id, text='Чтобы узнать о всех возможностях бота, посещайте пары')
+        bot.send_message(message.chat.id, text='Регистрация окончена, ждите опросов:)')
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
     if call.message:
         if call.data == "teacher":
-            # keyboard = types.InlineKeyboardMarkup()
             bot.send_message(chat_id=call.message.chat.id, text='Представьтесь, пожалуйста')
             bot.register_next_step_handler(call.message, teacher_name_step)
         elif call.data == "student":
             bot.send_message(chat_id=call.message.chat.id, text='Представьтесь, пожалуйста')
             bot.register_next_step_handler(call.message, student_name_step)
+        elif call.data == "link":
+            bot.register_next_step_handler(call.message, teacher_table_link_step)
+        elif call.data == "delete":
+            bot.register_next_step_handler(call.message, teacher_table_delete_step1)
+        elif call.data == "delete":
+            bot.register_next_step_handler(call.message, teacher_table_delete_step1)
+        elif call.data == "start test":
+            bot.register_next_step_handler(call.message, teacher_start_test_step)
+
 
 
 def teacher_name_step(message):
@@ -92,24 +100,65 @@ def teacher_table_link_step(message):
         try:
             link = find_url(link)[0]
             msg = bot.send_message(chat_id, text='Введите, как таблица будет называться в боте')
-            bot.register_next_step_handler(msg, teacher_table_name_step, link)
+            bot.register_next_step_handler(msg, teacher_table_name_step, link, False)
         except IndexError:
             bot.reply_to(message, 'Введите правильную ссылку на таблицу')
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
 
 
-def teacher_table_name_step(message, link):
+def teacher_table_name_step(message, link, reg):
     try:
         chat_id = message.chat.id
         name = message.text
-        table = Tables(url=link, user_id=chat_id, list_name=name)
-        db.session.add(table)
-        db.session.commit()
-        msg = bot.send_message(chat_id, text='Принято')
-        bot.register_next_step_handler(msg, teacher_start_test_step())
+
+        if not reg:
+            table = Tables(url=link, user_id=chat_id, list_name=name)
+            db.session.add(table)
+            db.session.commit()
+
+        keyboard = types.InlineKeyboardMarkup()
+        add_table = types.InlineKeyboardButton(text="Добавить таблицу", callback_data="link")
+        delete_table = types.InlineKeyboardButton(text="Удалить таблицу", callback_data="delete1")
+        start_test = types.InlineKeyboardButton(text="Начать тест", callback_data="start test")
+        keyboard.add(add_table)
+        keyboard.add(delete_table)
+        keyboard.add(start_test)
+        msg = bot.send_message(chat_id, text='Принято, вот доступные действия:')
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
+
+
+def teacher_delete_table_step1(message):
+    try:
+        chat_id = message.chat.id
+        keyboard = types.InlineKeyboardMarkup()
+        for i in Tables.query.filter_by(user_id=chat_id):
+            keyboard.add(types.InlineKeyboardButton(text="i", callback_data="delete2"))
+    except Exception as e:
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
+
+
+def teacher_delete_table_step2(message):
+    try:
+        chat_id = message.chat.id
+        text = message.text
+        msg = bot.send_message(chat_id, text='Таблица ' + text +'удалена')
+        bot.register_next_step_handler(msg, teacher_table_name_step, link, True)
+    except Exception as e:
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
+
+
+# def teacher_start_test_step(message):
+#         chat_id = message.chat.id
+#         name = message.text
+#         table = Tables(url=link, user_id=chat_id, list_name=name)
+#         db.session.add(table)
+#         db.session.commit()
+#         msg = bot.send_message(chat_id, text='Принято')
+#         bot.register_next_step_handler(msg, teacher_start_test_step)
+#     except Exception as e:
+#         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
 
 
 def student_name_step(message):
