@@ -17,6 +17,8 @@ def create_app(config_class=Config):
     with app.app_context():
         db.create_all()
 
+    sleep(1)
+
     bot.set_webhook(Config.URL.format(Config.secret))
     migrate = Migrate(app, db)
 
