@@ -55,10 +55,10 @@ def callback_inline(call):
         if call.data == "teacher":
             # keyboard = types.InlineKeyboardMarkup()
             bot.send_message(chat_id=call.message.chat.id, text='Представьтесь, пожалуйста')
-            bot.register_next_step_handler(message, teacher_name_step)
+            bot.register_next_step_handler(call.message, teacher_name_step)
         elif call.data == "student":
             bot.send_message(chat_id=call.message.chat.id, text='Представьтесь, пожалуйста')
-            bot.register_next_step_handler(message, student_name_step)
+            bot.register_next_step_handler(call.message, student_name_step)
 
 
 def teacher_name_step(message):
