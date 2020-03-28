@@ -8,6 +8,7 @@ db = SQLAlchemy()
 bot = telebot.TeleBot(Config.secret, threaded=False)
 bot.remove_webhook()
 
+
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(Config)
