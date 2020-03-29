@@ -51,32 +51,64 @@ def start_command(message):
         keyboard.add(callback_button_student)
         bot.send_message(message.chat.id, text='Выберите роль', reply_markup=keyboard)
     elif message.text == "Нет, я не хочу передавать свой телефон":
-        bot.send_message(message.chat.id, text='Чтобы узнать о всех возможностях бота, посещайте пары')
+        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=False)
+        change_name = types.KeyboardButton(text='Поменять имя')
+        phone = types.KeyboardButton(text='Передать номер телефона', request_contact=True)
+        keyboard.add(change_name)
+        keyboard.add(phone)
+        bot.send_message(message.chat.id, text='Тогда всё готово! :)', reply_markup=keyboard)
+    elif message.text == "Поменять имя":
+        msg = bot.send_message(message.chat.id, text='Ввведите новое имя')
+        bot.register_next_step_handler(msg, student_change_name_step)
+    elif message.text == "/test":
+        try:
+            try:
+                msg = Student.query.filter(Student.id == str(message.chat.id)).first()
+                bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + str(msg))
+            except Exception:
+                msg = Teacher.query.filter(Teacher.id == str(message.chat.id)).first()
+                bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + str(msg))
+        except Exception as e:
+            bot.send_message(message.chat.id, text='Error ' + str(e))
+    else:
+        msg = bot.send_message(message.chat.id, text='Извините, но я такое не умею, я же не нейросеть...')
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
     if call.message:
         if call.data == "teacher":
-            # keyboard = types.InlineKeyboardMarkup()
             bot.send_message(chat_id=call.message.chat.id, text='Представьтесь, пожалуйста')
             bot.register_next_step_handler(call.message, teacher_name_step)
         elif call.data == "student":
             bot.send_message(chat_id=call.message.chat.id, text='Представьтесь, пожалуйста')
             bot.register_next_step_handler(call.message, student_name_step)
+        elif call.data == "link":
+            bot.register_next_step_handler(call.message, teacher_table_link_step)
+        elif call.data == "delete1":
+            bot.register_next_step_handler(call.message, teacher_table_delete_step1)
+        elif call.data == "delete2":
+            bot.register_next_step_handler(call.message, teacher_table_delete_step2)
+        elif call.data == "start test":
+            bot.register_next_step_handler(call.message, teacher_start_test_step)
 
 
 def teacher_name_step(message):
     try:
         chat_id = message.chat.id
         name = message.text
-        teacher = Teacher(id=chat_id, name=name)
-        db.session.add(teacher)
-        db.session.commit()
-        msg = bot.send_message(chat_id, text='Введите ссылку на таблицу Google')
-        bot.register_next_step_handler(msg, teacher_table_link_step)
+
+        try:
+            check_name = Student.query.filter(Student.id == str(chat_id)).first().name
+            bot.send_message(chat_id, text='Вы уже зарегистрировались как студент' + str(check_name))
+        except AttributeError:
+            teacher = Teacher(id=chat_id, name=name)
+            db.session.add(teacher)
+            db.session.commit()
+            msg = bot.send_message(chat_id, text='Введите ссылку на таблицу Google')
+            bot.register_next_step_handler(msg, teacher_table_link_step)
     except Exception as e:
-        bot.reply_to(message, "Произошла какая-то ошибка, я вас не понял")
+        bot.reply_to(message, "Произошла какая-то ошибка, я вас не понял" + str(e))
 
 
 def find_url(string):
@@ -92,23 +124,65 @@ def teacher_table_link_step(message):
         try:
             link = find_url(link)[0]
             msg = bot.send_message(chat_id, text='Введите, как таблица будет называться в боте')
-            bot.register_next_step_handler(msg, teacher_table_name_step, link)
+            bot.register_next_step_handler(msg, teacher_table_name_step, link, False)
         except IndexError:
             bot.reply_to(message, 'Введите правильную ссылку на таблицу')
     except Exception as e:
-        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
-def teacher_table_name_step(message, link):
+def teacher_table_name_step(message, link, reg):
     try:
         chat_id = message.chat.id
         name = message.text
-        table = Tables(url=link, user_id=chat_id, list_name=name)
-        db.session.add(table)
-        db.session.commit()
-        msg = bot.send_message(chat_id, text='Принято')
+
+        if not reg:
+            table = Tables(url=link, user_id=chat_id, list_name=name)
+            db.session.add(table)
+            db.session.commit()
+
+        keyboard = types.InlineKeyboardMarkup()
+        add_table = types.InlineKeyboardButton(text="Добавить таблицу", callback_data="link")
+        delete_table = types.InlineKeyboardButton(text="Удалить таблицу", callback_data="delete1")
+        start_test = types.InlineKeyboardButton(text="Начать тест", callback_data="start test")
+        keyboard.add(add_table)
+        keyboard.add(delete_table)
+        keyboard.add(start_test)
+        bot.send_message(chat_id, text='Принято, вот доступные действия:', reply_markup=keyboard)
     except Exception as e:
-        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
+
+
+def teacher_delete_table_step1(message):
+    try:
+        chat_id = message.chat.id
+        keyboard = types.InlineKeyboardMarkup()
+        for i in Tables.query.filter_by(Tables.user_id == str(chat_id)).all():
+            keyboard.add(types.InlineKeyboardButton(text=i, callback_data="delete2"))
+    except Exception as e:
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
+
+
+def teacher_delete_table_step2(message):
+    try:
+        chat_id = message.chat.id
+        text = message.text
+        msg = bot.send_message(chat_id, text='Таблица ' + text + ' удалена')
+        bot.register_next_step_handler(msg, teacher_table_name_step, link, True)
+    except Exception as e:
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
+
+
+# def teacher_start_test_step(message):
+#         chat_id = message.chat.id
+#         name = message.text
+#         table = Tables(url=link, user_id=chat_id, list_name=name)
+#         db.session.add(table)
+#         db.session.commit()
+#         msg = bot.send_message(chat_id, text='Принято')
+#         bot.register_next_step_handler(msg, teacher_start_test_step)
+#     except Exception as e:
+#         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
 
 
 def student_name_step(message):
@@ -118,23 +192,46 @@ def student_name_step(message):
         student = Student(id=chat_id, name=name)
         db.session.add(student)
         db.session.commit()
-        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
+        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=False)
         agree = types.KeyboardButton(text='Да, я хочу передать свой телефон', request_contact=True)
         decline = types.KeyboardButton(text='Нет, я не хочу передавать свой телефон')
         keyboard.add(agree)
         keyboard.add(decline)
         bot.send_message(chat_id, text='Хотите передать свой номер телефона?', reply_markup=keyboard)
     except Exception as e:
-        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
+
+
+def student_change_name_step(message):
+    try:
+        chat_id = message.chat.id
+        new_name = message.text
+        Student.query.filter(Student.id == str(chat_id)).first().name = new_name
+        db.session.commit()
+        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=False)
+        change_name = types.KeyboardButton(text='Поменять имя')
+        if not Student.query.filter(Student.id == str(chat_id)).first().phone:
+            phone = types.KeyboardButton(text='Передать номер телефона', request_contact=True)
+            keyboard.add(phone)
+        keyboard.add(change_name)
+        bot.send_message(chat_id, text='Завершено успешно', reply_markup=keyboard)
+    except Exception as e:
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
 @bot.message_handler(content_types=['contact'])
 def student_phone_step(message):
-    chat_id = message.chat.id
-    student_phone = message.contact.phone_number
-    Student.query.filter_by(id=chat_id).first().update({'phone': student_phone})
-    db.session.commit()
-    bot.send_message(chat_id, text='Завершено успешно')
+    try:
+        chat_id = message.chat.id
+        student_phone = message.contact.phone_number
+        Student.query.filter(Student.id == str(chat_id)).first().phone = student_phone
+        db.session.commit()
+        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=False)
+        change_name = types.KeyboardButton(text='Поменять имя')
+        keyboard.add(change_name)
+        bot.send_message(chat_id, text='Завершено успешно', reply_markup=keyboard)
+    except Exception as e:
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
 bot.enable_save_next_step_handlers(delay=2)
