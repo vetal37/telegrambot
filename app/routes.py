@@ -95,11 +95,11 @@ def teacher_name_step(message):
     try:
         chat_id = message.chat.id
         name = message.text
-        check_name = Student.query.filter(Student.id == str(chat_id)).first().name
-        if check_name:
-            msg = bot.send_message(chat_id, text='Вы уже зарегистрировались как студент' + str(check_name))
-            bot.register_next_step_handler(msg, teacher_table_link_step)
-        else:
+
+        try:
+            check_name = Student.query.filter(Student.id == str(chat_id)).first().name
+            bot.send_message(chat_id, text='Вы уже зарегистрировались как студент' + str(check_name))
+        except TypeError:
             teacher = Teacher(id=chat_id, name=name)
             db.session.add(teacher)
             db.session.commit()
