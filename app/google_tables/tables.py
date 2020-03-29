@@ -13,7 +13,7 @@ credentials = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE,
                                                                 'https://www.googleapis.com/auth/drive'])
 
 
-service = apiclient.discovery.build('sheets', 'v4', http = httpAuth) # Выбираем работу с таблицами и 4 версию API 
+service = googleapiclient.discovery.build('sheets', 'v4', http = httpAuth) # Выбираем работу с таблицами и 4 версию API 
 
 def get_spreadsheet_id_from_database():
     link = Table.url
