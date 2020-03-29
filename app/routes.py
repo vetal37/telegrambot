@@ -25,7 +25,7 @@ import re
 def webhook():
     try:
         bot.remove_webhook()
-        time.sleep(2)
+        time.sleep(0.6)
         bot.set_webhook(Config.URL + Config.secret)
     except Exception as e:
         return "Ошибка ", e
@@ -152,7 +152,7 @@ def teacher_table_name_step(message, link, reg):
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
-def teacher_delete_table_step1(message):
+def teacher_table_delete_step1(message):
     try:
         chat_id = message.chat.id
         keyboard = types.InlineKeyboardMarkup()
@@ -162,7 +162,7 @@ def teacher_delete_table_step1(message):
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
-def teacher_delete_table_step2(message):
+def teacher_table_delete_step2(message):
     try:
         chat_id = message.chat.id
         text = message.text
