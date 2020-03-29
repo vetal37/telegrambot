@@ -51,7 +51,10 @@ def start_command(message):
         keyboard.add(callback_button_student)
         bot.send_message(message.chat.id, text='Выберите роль', reply_markup=keyboard)
     elif message.text == "Нет, я не хочу передавать свой телефон":
-        bot.send_message(message.chat.id, text='Регистрация окончена, ждите опросов:)')
+        bot.send_message(message.chat.id, text='Тогда всё готово! :)')
+    elif message.text == "Поменять имя":
+        msg = bot.send_message(message.chat.id, text='Ввведите новое имя')
+        bot.register_next_step_handler(msg, student_change_name_step)
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -65,10 +68,10 @@ def callback_inline(call):
             bot.register_next_step_handler(call.message, student_name_step)
         elif call.data == "link":
             bot.register_next_step_handler(call.message, teacher_table_link_step)
-        elif call.data == "delete":
+        elif call.data == "delete1":
             bot.register_next_step_handler(call.message, teacher_table_delete_step1)
-        elif call.data == "delete":
-            bot.register_next_step_handler(call.message, teacher_table_delete_step1)
+        elif call.data == "delete2":
+            bot.register_next_step_handler(call.message, teacher_table_delete_step2)
         elif call.data == "start test":
             bot.register_next_step_handler(call.message, teacher_start_test_step)
 
@@ -167,7 +170,24 @@ def student_name_step(message):
         student = Student(id=chat_id, name=name)
         db.session.add(student)
         db.session.commit()
-        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
+        keyboard = types.ReplyKeyboardHide(hide_keyboard=True)
+        agree = types.KeyboardButton(text='Да, я хочу передать свой телефон', request_contact=True)
+        decline = types.KeyboardButton(text='Нет, я не хочу передавать свой телефон')
+        keyboard.add(agree)
+        keyboard.add(decline)
+        bot.send_message(chat_id, text='Хотите передать свой номер телефона?', reply_markup=keyboard)
+    except Exception as e:
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
+
+
+def student_change_name_step(message):
+    try:
+        chat_id = message.chat.id
+        new_name = message.text
+        Student.query.filter(Student.id == str(chat_id)).first().name = new_name
+        db.session.flush()
+        db.session.commit()
+        keyboard = types.ReplyKeyboardHide(hide_keyboard=True)
         agree = types.KeyboardButton(text='Да, я хочу передать свой телефон', request_contact=True)
         decline = types.KeyboardButton(text='Нет, я не хочу передавать свой телефон')
         keyboard.add(agree)
@@ -181,11 +201,13 @@ def student_name_step(message):
 def student_phone_step(message):
     chat_id = message.chat.id
     student_phone = message.contact.phone_number
-    phone = Student.query.filter(Student.id == str(chat_id)).first()
-    phone.state = student_phone
+    Student.query.filter(Student.id == str(chat_id)).first().phone = student_phone
     db.session.flush()
     db.session.commit()
-    bot.send_message(chat_id, text='Завершено успешно')
+    keyboard = types.ReplyKeyboardHide(hide_keyboard=True)
+    change_name = types.KeyboardButton(text='Поменять имя')
+    keyboard.add(change_name)
+    bot.send_message(chat_id, text='Завершено успешно', reply_markup=keyboard)
 
 
 bot.enable_save_next_step_handlers(delay=2)
