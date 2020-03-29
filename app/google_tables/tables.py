@@ -75,7 +75,7 @@ def fill_in_date_in_table(spreadsheet_id, list_id, list_name):
     for letter in alphabet:
         if sheet_counter < 27:
             cell_name = letter[sheet_counter]
-        elif:
+        else:
             cell_name = letter[sheet_counter // 26] + letter[sheet_counter % 26]
     cell_name = cell_name + "1"
     ranges = [list_name + "!" + cell_name]    
@@ -87,4 +87,4 @@ def fill_in_date_in_table(spreadsheet_id, list_id, list_name):
                             "values": [time.strftime("%d.%m.%Y", datetime.date.today())]}
     ]
     }).execute()
-    
+
