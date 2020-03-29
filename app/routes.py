@@ -70,6 +70,8 @@ def start_command(message):
                 bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + str(msg))
         except Exception as e:
             bot.send_message(message.chat.id, text='Error ' + str(e))
+    else:
+        msg = bot.send_message(message.chat.id, text='Извините, но я такое не умею, я же не нейросеть...')
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -146,7 +148,7 @@ def teacher_table_name_step(message, link, reg):
         keyboard.add(add_table)
         keyboard.add(delete_table)
         keyboard.add(start_test)
-        bot.send_message(chat_id, text='Принято, вот доступные действия:')
+        bot.send_message(chat_id, text='Принято, вот доступные действия:', reply_markup=keyboard)
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
