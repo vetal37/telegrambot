@@ -69,7 +69,7 @@ def start_command(message):
                 msg = Teacher.query.filter(Teacher.id == str(message.chat.id)).first()
                 bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + msg)
         except Exception as e:
-            bot.send_message(message.chat.id, text='Error ' + e)
+            bot.send_message(message.chat.id, text='Error ' + str(e))
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -101,7 +101,7 @@ def teacher_name_step(message):
         msg = bot.send_message(chat_id, text='Введите ссылку на таблицу Google')
         bot.register_next_step_handler(msg, teacher_table_link_step)
     except Exception as e:
-        bot.reply_to(message, "Произошла какая-то ошибка, я вас не понял" + e)
+        bot.reply_to(message, "Произошла какая-то ошибка, я вас не понял" + str(e))
 
 
 def find_url(string):
@@ -121,7 +121,7 @@ def teacher_table_link_step(message):
         except IndexError:
             bot.reply_to(message, 'Введите правильную ссылку на таблицу')
     except Exception as e:
-        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + e)
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
 def teacher_table_name_step(message, link, reg):
@@ -143,7 +143,7 @@ def teacher_table_name_step(message, link, reg):
         keyboard.add(start_test)
         bot.send_message(chat_id, text='Принято, вот доступные действия:')
     except Exception as e:
-        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + e)
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
 def teacher_delete_table_step1(message):
@@ -153,7 +153,7 @@ def teacher_delete_table_step1(message):
         for i in Tables.query.filter_by(Tables.user_id == str(chat_id)).all():
             keyboard.add(types.InlineKeyboardButton(text=i, callback_data="delete2"))
     except Exception as e:
-        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + e)
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
 def teacher_delete_table_step2(message):
@@ -163,7 +163,7 @@ def teacher_delete_table_step2(message):
         msg = bot.send_message(chat_id, text='Таблица ' + text + ' удалена')
         bot.register_next_step_handler(msg, teacher_table_name_step, link, True)
     except Exception as e:
-        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + e)
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
 # def teacher_start_test_step(message):
@@ -192,7 +192,7 @@ def student_name_step(message):
         keyboard.add(decline)
         bot.send_message(chat_id, text='Хотите передать свой номер телефона?', reply_markup=keyboard)
     except Exception as e:
-        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + e)
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
 def student_change_name_step(message):
@@ -209,7 +209,7 @@ def student_change_name_step(message):
         keyboard.add(phone)
         bot.send_message(chat_id, text='Завершено успешно', reply_markup=keyboard)
     except Exception as e:
-        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + e)
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
 @bot.message_handler(content_types=['contact'])
@@ -225,7 +225,7 @@ def student_phone_step(message):
         keyboard.add(change_name)
         bot.send_message(chat_id, text='Завершено успешно', reply_markup=keyboard)
     except Exception as e:
-        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + e)
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
 bot.enable_save_next_step_handlers(delay=2)
