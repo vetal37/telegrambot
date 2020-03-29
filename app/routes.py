@@ -64,10 +64,10 @@ def start_command(message):
         try:
             try:
                 msg = Student.query.filter(Student.id == str(message.chat.id)).first()
-                bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + msg)
+                bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + msg.text)
             except Exception:
                 msg = Teacher.query.filter(Teacher.id == str(message.chat.id)).first()
-                bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + msg)
+                bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + msg.text)
         except Exception as e:
             bot.send_message(message.chat.id, text='Error ' + str(e))
 
