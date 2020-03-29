@@ -25,7 +25,7 @@ import re
 def webhook():
     try:
         bot.remove_webhook()
-        time.sleep(1)
+        time.sleep(4)
         bot.set_webhook(Config.URL + Config.secret)
     except Exception as e:
         return "Ошибка ", e
@@ -78,11 +78,11 @@ def start_command(message):
 def callback_inline(call):
     if call.message:
         if call.data == "teacher":
-            bot.send_message(chat_id=call.message.chat.id, text='Представьтесь, пожалуйста')
-            bot.register_next_step_handler(call.message, teacher_name_step)
+            msg = bot.send_message(chat_id=call.message.chat.id, text='Представьтесь, пожалуйста')
+            bot.register_next_step_handler(msg, teacher_name_step)
         elif call.data == "student":
-            bot.send_message(chat_id=call.message.chat.id, text='Представьтесь, пожалуйста')
-            bot.register_next_step_handler(call.message, student_name_step)
+            msg = bot.send_message(chat_id=call.message.chat.id, text='Представьтесь, пожалуйста')
+            bot.register_next_step_handler(msg, student_name_step)
         elif call.data == "link":
             bot.register_next_step_handler(call.message, teacher_table_link_step)
         elif call.data == "delete1":
@@ -234,6 +234,6 @@ def student_phone_step(message):
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
-bot.enable_save_next_step_handlers(delay=2)
+bot.enable_save_next_step_handlers(delay=1)
 
 bot.load_next_step_handlers()
