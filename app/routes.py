@@ -62,11 +62,14 @@ def start_command(message):
         bot.register_next_step_handler(msg, student_change_name_step)
     elif message.text == "/test":
         try:
-            msg = Student.query.filter(Student.id == str(message.chat_id)).first()
-            bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + msg)
-        except Exception:
-            msg = Teacher.query.filter(Teacher.id == str(message.chat_id)).first()
-            bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + msg)
+            try:
+                msg = Student.query.filter(Student.id == str(message.chat.id)).first()
+                bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + msg)
+            except Exception:
+                msg = Teacher.query.filter(Teacher.id == str(message.chat.id)).first()
+                bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + msg)
+        except Exception as e:
+            bot.send_message(message.chat.id, text='Error ' + e)
 
 
 @bot.callback_query_handler(func=lambda call: True)
