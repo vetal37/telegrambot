@@ -3,6 +3,8 @@ import httplib2
 import googleapiclient.discovery
 from oauth2client.service_account import ServiceAccountCredentials
 from app.models import Teacher, Tables
+import datetime
+import time
 
 
 CREDENTIALS_FILE = 'woven-environs-272314-a2f4d17f757a.json'  # Имя файла с закрытым ключом, вы должны подставить свое
@@ -35,10 +37,19 @@ def get_link_id_from_database(): #TODO: variables for method
 spreadsheet_id = get_spreadsheet_id_from_database()
 list_id = get_link_id_from_database()
 
-ranges_id = "Лист1" + "!A2:A40"
+def get_sheet_name(spreadsheet_id, list_id):
+    spreadsheet = service.spreadsheets().get(spreadsheetId = spreadsheet_id).execute()
+    sheetList = spreadsheet.get('sheets')
+    for sheet in sheetList:
+        if sheet['properties']['sheetId'] == list_id:
+            return sheet['properties']['title']
 
-results = service.spreadsheets().values().batchGet(spreadsheetId = "1sZUcqBWCswPwbUVH2Lt0X4toJp4DbPbWAtRC_TXV6Lg", 
-                                                   ranges = ranges_id, 
+
+list_name = get_sheet_name(spreadsheet_id, list_id)
+ranges_name = [list_name + "!A2:A40"]
+
+results = service.spreadsheets().values().batchGet(spreadsheetId = spreadsheet_id, 
+                                                   ranges = ranges_name, 
                                                    valueRenderOption = 'FORMATTED_VALUE',  
                                                    dateTimeRenderOption = 'FORMATTED_STRING').execute()
 sheet_counter = len(results['valueRanges'][0]['values'])
@@ -53,3 +64,27 @@ ranges = {
         "endColumnIndex": 1 # по endColumnIndex - 1
     }}
 
+def fill_in_date_in_table(spreadsheet_id, list_id, list_name):
+    ranges = [list_name + "!A1:AAA1"]
+    results = service.spreadsheets().values().batchGet(spreadsheetId = spreadsheet_id, 
+                                                   ranges = ranges_name, 
+                                                   valueRenderOption = 'FORMATTED_VALUE',  
+                                                   dateTimeRenderOption = 'FORMATTED_STRING').execute()
+    sheet_counter = len(results['valueRanges'][0]['values'])
+    alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+    for letter in alphabet:
+        if sheet_counter < 27:
+            cell_name = letter[sheet_counter]
+        elif:
+            cell_name = letter[sheet_counter // 26] + letter[sheet_counter % 26]
+    cell_name = cell_name + "1"
+    ranges = [list_name + "!" + cell_name]    
+    date_input = service.spreadsheets().values().batchUpdate(spreadsheetId = spreadsheetId, body = {
+                    "valueInputOption": "USER_ENTERED", # Данные воспринимаются, как вводимые пользователем (считается значение формул)
+                    "data": [
+                            {"range": ranges,
+                            "majorDimension": "ROWS",     # Сначала заполнять строки, затем столбцы
+                            "values": [time.strftime("%d.%m.%Y", datetime.date.today())]}
+    ]
+    }).execute()
+    
