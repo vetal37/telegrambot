@@ -99,7 +99,7 @@ def teacher_name_step(message):
         try:
             check_name = Student.query.filter(Student.id == str(chat_id)).first().name
             bot.send_message(chat_id, text='Вы уже зарегистрировались как студент' + str(check_name))
-        except TypeError:
+        except AttributeError:
             teacher = Teacher(id=chat_id, name=name)
             db.session.add(teacher)
             db.session.commit()
@@ -205,13 +205,13 @@ def student_change_name_step(message):
         chat_id = message.chat.id
         new_name = message.text
         Student.query.filter(Student.id == str(chat_id)).first().name = new_name
-        db.session.flush()
         db.session.commit()
         keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=False)
         change_name = types.KeyboardButton(text='Поменять имя')
-        phone = types.KeyboardButton(text='Передать номер телефона', request_contact=True)
+        if not Student.query.filter(Student.id == str(chat_id)).first().phone:
+            phone = types.KeyboardButton(text='Передать номер телефона', request_contact=True)
+            keyboard.add(phone)
         keyboard.add(change_name)
-        keyboard.add(phone)
         bot.send_message(chat_id, text='Завершено успешно', reply_markup=keyboard)
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
@@ -223,7 +223,6 @@ def student_phone_step(message):
         chat_id = message.chat.id
         student_phone = message.contact.phone_number
         Student.query.filter(Student.id == str(chat_id)).first().phone = student_phone
-        db.session.flush()
         db.session.commit()
         keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=False)
         change_name = types.KeyboardButton(text='Поменять имя')
