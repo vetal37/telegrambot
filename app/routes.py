@@ -25,7 +25,7 @@ import re
 def webhook():
     try:
         bot.remove_webhook()
-        time.sleep(4)
+        time.sleep(2)
         bot.set_webhook(Config.URL + Config.secret)
     except Exception as e:
         return "Ошибка ", e
@@ -112,8 +112,7 @@ def teacher_name_step(message):
 
 
 def find_url(string):
-    url = re.findall("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+] |"
-                     " [! * \(\),] | (?: %[0-9a-fA-F][0-9a-fA-F]))+", string)
+    url = re.findall("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),#]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", string)
     return url
 
 
