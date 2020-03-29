@@ -74,12 +74,12 @@ def fill_in_date_in_table(spreadsheet_id, list_id, list_name):
     alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
     for letter in alphabet:
         if sheet_counter < 27:
-            cell_name = letter[sheet_counter]
+            cell_code = letter[sheet_counter]
         else:
-            cell_name = letter[sheet_counter // 26] + letter[sheet_counter % 26]
-    cell_name = cell_name + "1"
+            cell_code = letter[sheet_counter // 26] + letter[sheet_counter % 26]
+    cell_name = cell_code + "1"
     ranges = [list_name + "!" + cell_name]    
-    date_input = service.spreadsheets().values().batchUpdate(spreadsheetId = spreadsheetId, body = {
+    service.spreadsheets().values().batchUpdate(spreadsheetId = spreadsheetId, body = {
                     "valueInputOption": "USER_ENTERED", # Данные воспринимаются, как вводимые пользователем (считается значение формул)
                     "data": [
                             {"range": ranges,
@@ -87,4 +87,8 @@ def fill_in_date_in_table(spreadsheet_id, list_id, list_name):
                             "values": [time.strftime("%d.%m.%Y", datetime.date.today())]}
     ]
     }).execute()
+    return cell_code
+
+def vote_for_best_student(ranges, sheet_counter):
+    
 
