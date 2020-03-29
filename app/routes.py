@@ -51,16 +51,21 @@ def start_command(message):
         keyboard.add(callback_button_student)
         bot.send_message(message.chat.id, text='Выберите роль', reply_markup=keyboard)
     elif message.text == "Нет, я не хочу передавать свой телефон":
-        bot.send_message(message.chat.id, text='Тогда всё готово! :)')
+        keyboard = types.ReplyKeyboardHide(hide_keyboard=True)
+        change_name = types.KeyboardButton(text='Поменять имя')
+        phone = types.KeyboardButton(text='Передать номер телефона', request_contact=True)
+        keyboard.add(change_name)
+        keyboard.add(phone)
+        bot.send_message(message.chat.id, text='Тогда всё готово! :)', reply_markup=keyboard)
     elif message.text == "Поменять имя":
         msg = bot.send_message(message.chat.id, text='Ввведите новое имя')
         bot.register_next_step_handler(msg, student_change_name_step)
     elif message.text == "/test":
         try:
-            msg = Student.query.filter(Student.id == str(chat_id)).first()
+            msg = Student.query.filter(Student.id == str(message.chat_id)).first()
             bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + msg)
         except Exception:
-            msg = Teacher.query.filter(Teacher.id == str(chat_id)).first()
+            msg = Teacher.query.filter(Teacher.id == str(message.chat_id)).first()
             bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + msg)
 
 
@@ -133,7 +138,7 @@ def teacher_table_name_step(message, link, reg):
         keyboard.add(add_table)
         keyboard.add(delete_table)
         keyboard.add(start_test)
-        msg = bot.send_message(chat_id, text='Принято, вот доступные действия:')
+        bot.send_message(chat_id, text='Принято, вот доступные действия:')
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + e)
 
@@ -143,7 +148,7 @@ def teacher_delete_table_step1(message):
         chat_id = message.chat.id
         keyboard = types.InlineKeyboardMarkup()
         for i in Tables.query.filter_by(Tables.user_id == str(chat_id)).all():
-            keyboard.add(types.InlineKeyboardButton(text="i", callback_data="delete2"))
+            keyboard.add(types.InlineKeyboardButton(text=i, callback_data="delete2"))
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + e)
 
@@ -195,26 +200,29 @@ def student_change_name_step(message):
         db.session.flush()
         db.session.commit()
         keyboard = types.ReplyKeyboardHide(hide_keyboard=True)
-        agree = types.KeyboardButton(text='Да, я хочу передать свой телефон', request_contact=True)
-        decline = types.KeyboardButton(text='Нет, я не хочу передавать свой телефон')
-        keyboard.add(agree)
-        keyboard.add(decline)
-        bot.send_message(chat_id, text='Хотите передать свой номер телефона?', reply_markup=keyboard)
+        change_name = types.KeyboardButton(text='Поменять имя')
+        phone = types.KeyboardButton(text='Передать номер телефона', request_contact=True)
+        keyboard.add(change_name)
+        keyboard.add(phone)
+        bot.send_message(chat_id, text='Завершено успешно', reply_markup=keyboard)
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + e)
 
 
 @bot.message_handler(content_types=['contact'])
 def student_phone_step(message):
-    chat_id = message.chat.id
-    student_phone = message.contact.phone_number
-    Student.query.filter(Student.id == str(chat_id)).first().phone = student_phone
-    db.session.flush()
-    db.session.commit()
-    keyboard = types.ReplyKeyboardHide(hide_keyboard=True)
-    change_name = types.KeyboardButton(text='Поменять имя')
-    keyboard.add(change_name)
-    bot.send_message(chat_id, text='Завершено успешно', reply_markup=keyboard)
+    try:
+        chat_id = message.chat.id
+        student_phone = message.contact.phone_number
+        Student.query.filter(Student.id == str(chat_id)).first().phone = student_phone
+        db.session.flush()
+        db.session.commit()
+        keyboard = types.ReplyKeyboardHide(hide_keyboard=True)
+        change_name = types.KeyboardButton(text='Поменять имя')
+        keyboard.add(change_name)
+        bot.send_message(chat_id, text='Завершено успешно', reply_markup=keyboard)
+    except Exception as e:
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + e)
 
 
 bot.enable_save_next_step_handlers(delay=2)
