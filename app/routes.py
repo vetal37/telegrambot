@@ -51,7 +51,7 @@ def start_command(message):
         keyboard.add(callback_button_student)
         bot.send_message(message.chat.id, text='Выберите роль', reply_markup=keyboard)
     elif message.text == "Нет, я не хочу передавать свой телефон":
-        keyboard = types.ReplyKeyboardHide(hide_keyboard=True)
+        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True)
         change_name = types.KeyboardButton(text='Поменять имя')
         phone = types.KeyboardButton(text='Передать номер телефона', request_contact=True)
         keyboard.add(change_name)
@@ -185,7 +185,7 @@ def student_name_step(message):
         student = Student(id=chat_id, name=name)
         db.session.add(student)
         db.session.commit()
-        keyboard = types.ReplyKeyboardHide(hide_keyboard=True)
+        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True)
         agree = types.KeyboardButton(text='Да, я хочу передать свой телефон', request_contact=True)
         decline = types.KeyboardButton(text='Нет, я не хочу передавать свой телефон')
         keyboard.add(agree)
@@ -202,7 +202,7 @@ def student_change_name_step(message):
         Student.query.filter(Student.id == str(chat_id)).first().name = new_name
         db.session.flush()
         db.session.commit()
-        keyboard = types.ReplyKeyboardHide(hide_keyboard=True)
+        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True)
         change_name = types.KeyboardButton(text='Поменять имя')
         phone = types.KeyboardButton(text='Передать номер телефона', request_contact=True)
         keyboard.add(change_name)
@@ -220,7 +220,7 @@ def student_phone_step(message):
         Student.query.filter(Student.id == str(chat_id)).first().phone = student_phone
         db.session.flush()
         db.session.commit()
-        keyboard = types.ReplyKeyboardHide(hide_keyboard=True)
+        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True)
         change_name = types.KeyboardButton(text='Поменять имя')
         keyboard.add(change_name)
         bot.send_message(chat_id, text='Завершено успешно', reply_markup=keyboard)
