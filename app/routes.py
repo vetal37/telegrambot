@@ -7,6 +7,7 @@ import time
 from app.models import Student, Teacher, Tables
 from flask import request
 import re
+#import app.google_tables.tables
 
 
 # import httplib2
@@ -218,6 +219,14 @@ def student_change_name_step(message):
         bot.send_message(chat_id, text='Завершено успешно', reply_markup=keyboard)
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
+
+#def call_vote_for_best_student(message): #TODO голосовалка
+#    try:
+#        chat_id = message.chat.id
+#        keyboard = types.InlineKeyboardMarkup()
+#        student_on_lesson = tables.fill_in_date_in_table(tables.spreadsheet_id, tables.list_id, tables.list_name)
+#        while student_on_lesson != 0:
+#            student_name = 
 
 
 @bot.message_handler(content_types=['contact'])
