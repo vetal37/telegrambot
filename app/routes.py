@@ -7,7 +7,9 @@ import time
 from app.models import Student, Teacher, Tables
 from flask import request
 import re
-#import app.google_tables.tables
+
+
+# import app.google_tables.tables
 
 
 # import httplib2
@@ -45,37 +47,46 @@ def web_hook():
         flask.abort(403)
 
 
-@bot.message_handler(content_types=['text'])
+@bot.message_handler(commands=['start'])
 def start_command(message):
-    if message.text == "/start":
-        keyboard = types.InlineKeyboardMarkup()
-        callback_button_teacher = types.InlineKeyboardButton(text="Я преподаватель", callback_data="teacher")
-        callback_button_student = types.InlineKeyboardButton(text="Я студент", callback_data="student")
-        keyboard.add(callback_button_teacher)
-        keyboard.add(callback_button_student)
-        bot.send_message(message.chat.id, text='Выберите роль', reply_markup=keyboard)
-    elif message.text == "Нет, я не хочу передавать свой телефон":
-        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=False)
-        change_name = types.KeyboardButton(text='Поменять имя')
-        phone = types.KeyboardButton(text='Передать номер телефона', request_contact=True)
-        keyboard.add(change_name)
-        keyboard.add(phone)
-        bot.send_message(message.chat.id, text='Тогда всё готово! :)', reply_markup=keyboard)
-    elif message.text == "Поменять имя":
-        msg = bot.send_message(message.chat.id, text='Ввведите новое имя')
-        bot.register_next_step_handler(msg, student_change_name_step)
-    elif message.text == "/test":
+    keyboard = types.InlineKeyboardMarkup()
+    callback_button_teacher = types.InlineKeyboardButton(text="Я преподаватель", callback_data="teacher")
+    callback_button_student = types.InlineKeyboardButton(text="Я студент", callback_data="student")
+    keyboard.add(callback_button_teacher)
+    keyboard.add(callback_button_student)
+    bot.send_message(message.chat.id, text='Выберите роль', reply_markup=keyboard)
+
+
+@bot.message_handler(func=lambda message: message.text == "Нет, я не хочу передавать свой телефон"
+                     and message.content_type == 'text')
+def telephone(message):
+    keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=False)
+    change_name = types.KeyboardButton(text='Поменять имя')
+    phone = types.KeyboardButton(text='Передать номер телефона', request_contact=True)
+    keyboard.add(change_name)
+    keyboard.add(phone)
+    bot.send_message(message.chat.id, text='Тогда всё готово! :)', reply_markup=keyboard)
+
+
+@bot.message_handler(func=lambda message: message.text == "Поменять имя"
+                     and message.content_type == 'text')
+def new_name(message):
+    msg1 = bot.send_message(message.chat.id, text='Ввведите новое имя')
+    bot.register_next_step_handler(msg1, student_change_name_step)
+
+
+@bot.message_handler(func=lambda message: message.text == "/test"
+                     and message.content_type == 'text')
+def test(message):
+    try:
         try:
-            try:
-                msg = Student.query.filter(Student.id == str(message.chat.id)).first()
-                bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + str(msg))
-            except Exception:
-                msg = Teacher.query.filter(Teacher.id == str(message.chat.id)).first()
-                bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + str(msg))
-        except Exception as e:
-            bot.send_message(message.chat.id, text='Error ' + str(e))
-    else:
-        msg = bot.send_message(message.chat.id, text='Извините, но я такое не умею, я же не нейросеть...' + message.text)
+            msg = Student.query.filter(Student.id == str(message.chat.id)).first()
+            bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + str(msg))
+        except Exception:
+            msg = Teacher.query.filter(Teacher.id == str(message.chat.id)).first()
+            bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + str(msg))
+    except Exception as e:
+        bot.send_message(message.chat.id, text='Error ' + str(e))
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -199,7 +210,7 @@ def teacher_test_step(message):
     try:
         chat_id = message.chat.id
         name = message.text
-        
+
     except Exception as e:
         bot.reply_to(message, "Произошла какая-то ошибка, я вас не понял")
 
@@ -240,6 +251,7 @@ def student_change_name_step(message):
         bot.send_message(chat_id, text='Завершено успешно', reply_markup=keyboard)
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
+
 
 # def call_vote_for_best_student(message): #TODO голосовалка
 #     try:
