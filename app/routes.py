@@ -96,7 +96,7 @@ def callback_inline(call):
             bot.register_next_step_handler(call.message, teacher_test_step)
 
 
-async def teacher_name_step(message):
+def teacher_name_step(message):
     try:
         chat_id = message.chat.id
         name = message.text
@@ -119,7 +119,7 @@ def find_url(string):
     return url
 
 
-async def teacher_table_link_step(message):
+def teacher_table_link_step(message):
     try:
         chat_id = message.chat.id
         link = message.text
@@ -133,7 +133,7 @@ async def teacher_table_link_step(message):
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
-async def teacher_table_name_step(message, link, reg):
+def teacher_table_name_step(message, link, reg):
     try:
         chat_id = message.chat.id
         name = message.text
@@ -155,7 +155,7 @@ async def teacher_table_name_step(message, link, reg):
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
-async def teacher_table_delete_step1(message):
+def teacher_table_delete_step1(message):
     try:
         chat_id = message.chat.id
         keyboard = types.InlineKeyboardMarkup()
@@ -166,7 +166,7 @@ async def teacher_table_delete_step1(message):
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
-async def teacher_table_delete_step2(message):
+def teacher_table_delete_step2(message):
     try:
         chat_id = message.chat.id
         text = message.text
@@ -177,7 +177,7 @@ async def teacher_table_delete_step2(message):
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
-async def teacher_start_test_step(message):
+def teacher_start_test_step(message):
     try:
         chat_id = message.chat.id
         name = message.text
@@ -192,7 +192,7 @@ async def teacher_start_test_step(message):
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
 
 
-async def teacher_test_step(message):
+def teacher_test_step(message):
     try:
         chat_id = message.chat.id
         name = message.text
@@ -200,7 +200,7 @@ async def teacher_test_step(message):
         bot.reply_to(message, "Произошла какая-то ошибка, я вас не понял")
 
 
-async def student_name_step(message):
+def student_name_step(message):
     try:
         chat_id = message.chat.id
         name = message.text
@@ -217,7 +217,7 @@ async def student_name_step(message):
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
-async def student_change_name_step(message):
+def student_change_name_step(message):
     try:
         chat_id = message.chat.id
         new_name = message.text
@@ -243,7 +243,7 @@ async def student_change_name_step(message):
 
 
 @bot.message_handler(content_types=['contact'])
-async def student_phone_step(message):
+def student_phone_step(message):
     try:
         chat_id = message.chat.id
         student_phone = message.contact.phone_number
