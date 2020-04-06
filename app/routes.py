@@ -27,9 +27,10 @@ import re
 @app.route('/')
 def webhook():
     try:
-        bot.remove_webhook()
-        time.sleep(0.6)
+        # bot.remove_webhook()
+        # time.sleep(0.4)
         bot.set_webhook(Config.URL + Config.secret)
+        print("webhook set")
     except Exception as e:
         bot.send_message(message.chat.id, text="Ошибка " + str(e))
         return "Ошибка ", e
@@ -40,7 +41,7 @@ def webhook():
 def web_hook():
     if request.headers.get('content-type') == 'application/json':
         bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
-        print("!200")
+        print("message received 200")
         return "!", 200
     else:
         print("flask abort 403")
