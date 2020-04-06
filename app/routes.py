@@ -195,6 +195,7 @@ def teacher_test_step(message):
     try:
         chat_id = message.chat.id
         name = message.text
+        
     except Exception as e:
         bot.reply_to(message, "Произошла какая-то ошибка, я вас не понял")
 
@@ -232,13 +233,10 @@ def student_change_name_step(message):
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
-#def call_vote_for_best_student(message): #TODO голосовалка
-#    try:
-#        chat_id = message.chat.id
-#        keyboard = types.InlineKeyboardMarkup()
-#        student_on_lesson = tables.fill_in_date_in_table(tables.spreadsheet_id, tables.list_id, tables.list_name)
-#        while student_on_lesson != 0:
-#            student_name = 
+def call_vote_for_best_student(message): #TODO голосовалка
+    try:
+        chat_id = message.chat.id
+
 
 
 @bot.message_handler(content_types=['contact'])
