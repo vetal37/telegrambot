@@ -103,7 +103,7 @@ def teacher_name_step(message):
 
         try:
             check_name = Student.query.filter(Student.id == str(chat_id)).first().name
-            bot.send_message(chat_id, text='Вы уже зарегистрировались как студент' + str(check_name))
+            bot.send_message(chat_id, text='Вы уже зарегистрировались как студент ' + str(check_name))
         except AttributeError:
             teacher = Teacher(id=chat_id, name=name)
             db.session.add(teacher)
@@ -205,15 +205,19 @@ def student_name_step(message):
     try:
         chat_id = message.chat.id
         name = message.text
-        student = Student(id=chat_id, name=name)
-        db.session.add(student)
-        db.session.commit()
-        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=False)
-        agree = types.KeyboardButton(text='Да, я хочу передать свой телефон', request_contact=True)
-        decline = types.KeyboardButton(text='Нет, я не хочу передавать свой телефон')
-        keyboard.add(agree)
-        keyboard.add(decline)
-        bot.send_message(chat_id, text='Хотите передать свой номер телефона?', reply_markup=keyboard)
+        try:
+            check_name = Student.query.filter(Student.id == str(chat_id)).first().name
+            bot.send_message(chat_id, text='Вы уже зарегистрировались как студент ' + str(check_name))
+        except AttributeError:
+            student = Student(id=chat_id, name=name)
+            db.session.add(student)
+            db.session.commit()
+            keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=False)
+            agree = types.KeyboardButton(text='Да, я хочу передать свой телефон', request_contact=True)
+            decline = types.KeyboardButton(text='Нет, я не хочу передавать свой телефон')
+            keyboard.add(agree)
+            keyboard.add(decline)
+            bot.send_message(chat_id, text='Хотите передать свой номер телефона?', reply_markup=keyboard)
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
@@ -234,10 +238,9 @@ def student_change_name_step(message):
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
-def call_vote_for_best_student(message): #TODO голосовалка
-    try:
-        chat_id = message.chat.id
-
+# def call_vote_for_best_student(message): #TODO голосовалка
+#     try:
+#         chat_id = message.chat.id
 
 
 @bot.message_handler(content_types=['contact'])
