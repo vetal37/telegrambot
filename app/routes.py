@@ -274,6 +274,6 @@ def student_phone_step(message):
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
-bot.enable_save_next_step_handlers(delay=0.1)
+bot.enable_save_next_step_handlers(delay=2)
 
 bot.load_next_step_handlers()
