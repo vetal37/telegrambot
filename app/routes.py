@@ -175,16 +175,26 @@ def teacher_table_delete_step2(message):
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
-# def teacher_start_test_step(message):
-#         chat_id = message.chat.id
-#         name = message.text
-#         table = Tables(url=link, user_id=chat_id, list_name=name)
-#         db.session.add(table)
-#         db.session.commit()
-#         msg = bot.send_message(chat_id, text='Принято')
-#         bot.register_next_step_handler(msg, teacher_start_test_step)
-#     except Exception as e:
-#         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
+def teacher_start_test_step(message):
+    try:
+        chat_id = message.chat.id
+        name = message.text
+        table = Tables(url=link, user_id=chat_id, list_name=name)
+        db.session.add(table)
+        db.session.commit()
+        keyboard = types.InlineKeyboardMarkup()
+        for хуй in хуйs:
+            add_table = types.InlineKeyboardButton(text=хуй, callback_data=хуй)
+            keyboard.add(add_table)
+        msg = bot.send_message(chat_id, text='Выберите таблицу', reply_markup=keyboard)
+        bot.register_next_step_handler(msg, teacher_start_test_step)
+    except Exception as e:
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
+
+
+def start_test_messages(message):
+    try:
+        
 
 
 def student_name_step(message):

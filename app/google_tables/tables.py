@@ -97,6 +97,7 @@ def vote_for_best_student(ranges, sheet_counter, student_id):
                                                    ranges = ranges_name, 
                                                    valueRenderOption = 'FORMATTED_VALUE',  
                                                    dateTimeRenderOption = 'FORMATTED_STRING').execute()
+    rating = results['valueRanges'][0]['values']
     if int(rating) != 0: #TODO function for voting in routes.py
 #Идея такая: каждому челу на паре (отмеченному в таблице) присваивается student_id = номеру его строки
 #тогда если проголосовал: new_results = results[student_id] + 1
@@ -112,10 +113,4 @@ def vote_for_best_student(ranges, sheet_counter, student_id):
                             ]
                             }).execute()
 #TODO почекай, что тут ещё надо для голосовалки
-    return #TODO variable to return
-
-def fill_in_names_and_phones():
-    #TODO а как с базой работать? Скинь документацию
-    #TODO заполнение таблицы из базы данных
-    #TODO сегодня сделаю, если кинешь
     return #TODO variable to return
