@@ -24,17 +24,17 @@ import re
 # service = googleapiclient.discovery.build('sheets', 'v4', http=httpAuth) # Выбираем работу с таблицами и 4 версию API
 
 
-# @app.route('/')
-# def webhook():
-#     try:
-#         bot.remove_webhook()
-#         time.sleep(0.4)
-#         bot.set_webhook(Config.URL + Config.secret)
-#         print("webhook set")
-#     except Exception as e:
-#         bot.send_message(message.chat.id, text="Ошибка " + str(e))
-#         return "Ошибка ", e
-#     return "!", 200
+@app.route('/')
+def webhook():
+    try:
+        bot.remove_webhook()
+        time.sleep(0.4)
+        bot.set_webhook(Config.URL + Config.secret)
+        print("webhook set")
+    except Exception as e:
+        bot.send_message(message.chat.id, text="Ошибка " + str(e))
+        return "Ошибка ", e
+    return "!", 200
 
 
 @app.route('/{}'.format(Config.secret), methods=["POST"])
