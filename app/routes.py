@@ -92,6 +92,8 @@ def callback_inline(call):
             bot.register_next_step_handler(call.message, teacher_table_delete_step2)
         elif call.data == "start test":
             bot.register_next_step_handler(call.message, teacher_start_test_step)
+        elif call.data == "test table":
+            bot.register_next_step_handler(call.message, teacher_test_step)
 
 
 def teacher_name_step(message):
@@ -182,18 +184,19 @@ def teacher_start_test_step(message):
         db.session.add(table)
         db.session.commit()
         keyboard = types.InlineKeyboardMarkup()
-        for хуй in хуйs:
-            add_table = types.InlineKeyboardButton(text=хуй, callback_data=хуй)
-            keyboard.add(add_table)
+        for i in Tables.query.filter_by(Tables.user_id == str(chat_id)).all():
+            keyboard.add(types.InlineKeyboardButton(text=i, callback_data="test table"))
         msg = bot.send_message(chat_id, text='Выберите таблицу', reply_markup=keyboard)
-        bot.register_next_step_handler(msg, teacher_start_test_step)
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
 
 
-def start_test_messages(message):
+def teacher_test_step(message):
     try:
-        
+        chat_id = message.chat.id
+        name = message.text
+    except Exception as e:
+        bot.reply_to(message, "Произошла какая-то ошибка, я вас не понял")
 
 
 def student_name_step(message):
