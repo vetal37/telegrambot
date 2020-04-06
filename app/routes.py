@@ -29,6 +29,7 @@ def webhook():
         time.sleep(0.6)
         bot.set_webhook(Config.URL + Config.secret)
     except Exception as e:
+        bot.send_message(message.chat.id, text="Ошибка " + str(e))
         return "Ошибка ", e
     return "!", 200
 
@@ -37,8 +38,10 @@ def webhook():
 def web_hook():
     if request.headers.get('content-type') == 'application/json':
         bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+        print("!200")
         return "!", 200
     else:
+        print("flask abort 403")
         flask.abort(403)
 
 
@@ -71,8 +74,8 @@ def start_command(message):
                 bot.send_message(message.chat.id, text='Вот всё, что на вас есть:' + str(msg))
         except Exception as e:
             bot.send_message(message.chat.id, text='Error ' + str(e))
-    # else:
-    #     msg = bot.send_message(message.chat.id, text='Извините, но я такое не умею, я же не нейросеть...')
+    else:
+        msg = bot.send_message(message.chat.id, text='Извините, но я такое не умею, я же не нейросеть...')
 
 
 @bot.callback_query_handler(func=lambda call: True)
