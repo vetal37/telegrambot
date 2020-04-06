@@ -174,7 +174,8 @@ def teacher_table_delete_step1(message):
     try:
         chat_id = message.chat.id
         keyboard = types.InlineKeyboardMarkup()
-        for i in Tables.query.filter_by(Tables.user_id == str(chat_id)).all().list_name:
+        for i in Tables.query.filter_by(
+                Tables.user_id == str(chat_id)).all().list_name:
             keyboard.add(types.InlineKeyboardButton(text=i, callback_data="delete2"))
         bot.send_message(chat_id, text='Выберите таблицу для удаления', reply_markup=keyboard)
     except Exception as e:
@@ -200,7 +201,10 @@ def teacher_start_test_step(message):
         db.session.add(table)
         db.session.commit()
         keyboard = types.InlineKeyboardMarkup()
-        for i in Tables.query.filter_by(Tables.user_id == str(chat_id)).all():
+        query = Tables.query.filter_by(Tables.user_id == str(chat_id)).all()
+        #  log:
+        print(query)
+        for i in query:
             keyboard.add(types.InlineKeyboardButton(text=i, callback_data="test table"))
         msg = bot.send_message(chat_id, text='Выберите таблицу', reply_markup=keyboard)
     except Exception as e:
