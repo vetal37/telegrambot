@@ -6,7 +6,7 @@ import telebot
 import time
 
 db = SQLAlchemy()
-bot = telebot.AsyncTeleBot(Config.secret, threaded=False)
+bot = telebot.AsyncTeleBot(Config.secret, threaded=True)
 
 
 def create_app(config_class=Config):
