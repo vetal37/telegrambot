@@ -30,4 +30,4 @@ class Student(db.Model):
     score = db.Column(db.Integer)
 
     def __repr__(self):
-        return f"Student('{self.id}', '{self.name}', '{self.phone}')"
+        return f"Student('{self.id}', '{self.name}', '{self.phone}', '{self.score}')"
