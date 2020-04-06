@@ -254,10 +254,16 @@ def student_change_name_step(message):
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
-# def call_vote_for_best_student(message): #TODO голосовалка
-#     try:
-#         chat_id = message.chat.id
-
+def vote_for_best_student(message): #TODO голосовалка
+    try:
+        chat_id = message.chat.id
+        students = []
+        students.append(Student.query.filter(Student.id == str.chat_id).all().name)
+        bot.send_poll(chat_id=chat_id, poll = {
+            question = "Кто является самым активным студентом?", options = students, 
+            type = regular, allows_multiple_answers = True})
+    except Exception as e:
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
 
 @bot.message_handler(content_types=['contact'])
 def student_phone_step(message):
