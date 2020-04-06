@@ -80,6 +80,7 @@ def callback_inline(call):
     if call.message:
         if call.data == "teacher":
             msg = bot.send_message(chat_id=call.message.chat.id, text='Представьтесь, пожалуйста')
+            bot.answer_callback_query(callback_query_id=call.message.chat.id, show_alert=False)
             bot.register_next_step_handler(msg, teacher_name_step)
         elif call.data == "student":
             msg = bot.send_message(chat_id=call.message.chat.id, text='Представьтесь, пожалуйста')
