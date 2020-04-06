@@ -75,7 +75,7 @@ def start_command(message):
         except Exception as e:
             bot.send_message(message.chat.id, text='Error ' + str(e))
     else:
-        msg = bot.send_message(message.chat.id, text='Извините, но я такое не умею, я же не нейросеть...')
+        msg = bot.send_message(message.chat.id, text='Извините, но я такое не умею, я же не нейросеть...' + message.text())
 
 
 @bot.callback_query_handler(func=lambda call: True)
