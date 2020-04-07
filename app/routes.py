@@ -257,10 +257,13 @@ def student_change_name_step(message):
 def vote_for_best_student(message): #TODO голосовалка
     try:
         chat_id = message.chat.id
+        student_on_lesson = app.google_tables.tables.students_on_lesson(app.google_tables.tables.ranges, app.google_tables.tables.sheet_counter)
         poll = types.Poll(question="Кто является самым активным студентом?")
-        for i in Student.query.filter(Student.id == str(chat_id)).all():
-            poll.add(Student.query.filter(Student.id == str(chat_id)).first().name)
-        bot.send_poll(chat_id=chat_id, poll = poll)
+        for i in student_on_lesson:
+            poll.add(student_on_lesson[i])
+        for j in student_on_lesson:
+            student_chat_id = Student.query.filter(Student.name == str(student_on_lesson[i])).first().id
+            bot.send_poll(chat_id=student_chat_id, poll = poll)
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
 
