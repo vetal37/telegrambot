@@ -186,8 +186,8 @@ def teacher_table_delete_step2(message):
     try:
         chat_id = message.chat.id
         text = message.text.replace('delete2', '')
-        d = Tables.delete().where(Tables.list_name == text)
-        d.execute()
+        Tables.query.filter(Tables.list_name == str(text)).first().delete(synchronize_session=False)
+        db.session.commit()
         msg = bot.send_message(chat_id, text='Таблица ' + text + ' удалена')
         bot.register_next_step_handler(msg, teacher_table_name_step, None, True)
     except Exception as e:
