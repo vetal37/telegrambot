@@ -104,7 +104,7 @@ def callback_inline(call):
         elif call.data == "delete1":
             teacher_table_delete_step1(call.message)
         elif "delete2" in call.data:
-            teacher_table_delete_step2(call.data)
+            teacher_table_delete_step2(call.message, call.data)
         elif call.data == "start test":
             bot.register_next_step_handler(call.message, teacher_start_test_step)
         elif "test_table" in call.data:
@@ -182,11 +182,10 @@ def teacher_table_delete_step1(message):
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял ' + str(e))
 
 
-def teacher_table_delete_step2(message):
+def teacher_table_delete_step2(message, tablename):
     try:
         chat_id = message.chat.id
-        text = message.text
-        text = text.replace('delete2', '')
+        text = tablename.replace('delete2', '')
         print(text)
         Tables.query.filter(Tables.list_name == str(text)).delete(synchronize_session=False)
         db.session.commit()
