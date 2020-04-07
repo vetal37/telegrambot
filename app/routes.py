@@ -59,7 +59,7 @@ def start_command(message):
 
 
 @bot.message_handler(func=lambda message: message.text == "Нет, я не хочу передавать свой телефон"
-                                          and message.content_type == 'text')
+                     and message.content_type == 'text')
 def telephone(message):
     keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=False)
     change_name = types.KeyboardButton(text='Поменять имя')
@@ -70,14 +70,14 @@ def telephone(message):
 
 
 @bot.message_handler(func=lambda message: message.text == "Поменять имя"
-                                          and message.content_type == 'text')
+                     and message.content_type == 'text')
 def new_name(message):
     msg1 = bot.send_message(message.chat.id, text='Ввведите новое имя')
     bot.register_next_step_handler(msg1, student_change_name_step)
 
 
 @bot.message_handler(func=lambda message: message.text == "/test"
-                                          and message.content_type == 'text')
+                     and message.content_type == 'text')
 def test(message):
     try:
         try:
@@ -185,8 +185,10 @@ def teacher_table_delete_step1(message):
 def teacher_table_delete_step2(message):
     try:
         chat_id = message.chat.id
-        text = message.text.replace('delete2', '')
-        Tables.query.filter(Tables.list_name == str(text)).first().delete(synchronize_session=False)
+        text = message.text
+        text = text.replace('delete2', '')
+        print(text)
+        Tables.query.filter(Tables.list_name == str(text)).delete(synchronize_session=False)
         db.session.commit()
         msg = bot.send_message(chat_id, text='Таблица ' + text + ' удалена')
         bot.register_next_step_handler(msg, teacher_table_name_step, None, True)
