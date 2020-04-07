@@ -102,9 +102,9 @@ def callback_inline(call):
         elif call.data == "link":
             bot.register_next_step_handler(call.message, teacher_table_link_step)
         elif call.data == "delete1":
-            bot.register_next_step_handler(call.message, teacher_table_delete_step1)
+            teacher_table_delete_step1(call.message)
         elif call.data == "delete2":
-            bot.register_next_step_handler(call.message, teacher_table_delete_step2)
+            teacher_table_delete_step2(call.message)
         elif call.data == "start test":
             bot.register_next_step_handler(call.message, teacher_start_test_step)
         elif call.data == "test table":
