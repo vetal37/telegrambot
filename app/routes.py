@@ -262,7 +262,7 @@ def vote_for_best_student(message): #TODO голосовалка
         for i in student_on_lesson:
             poll.add(student_on_lesson[i])
         for j in student_on_lesson:
-            student_chat_id = Student.query.filter(Student.name == str(student_on_lesson[i])).first().id
+            student_chat_id = Student.query.filter(Student.name == str(student_on_lesson[j])).first().id
             bot.send_poll(chat_id=student_chat_id, poll = poll)
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
