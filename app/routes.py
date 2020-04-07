@@ -201,14 +201,14 @@ def teacher_start_test_step(message):
         db.session.add(table)
         db.session.commit()
         keyboard = types.InlineKeyboardMarkup()
-        query = Tables.query.filter_by(Tables.user_id == str(chat_id)).all()
+        query = Tables.query.filter_by(user_id=str(chat_id)).all()
         #  log:
         print(query)
         for i in query:
             keyboard.add(types.InlineKeyboardButton(text=i, callback_data="test table"))
         msg = bot.send_message(chat_id, text='Выберите таблицу', reply_markup=keyboard)
     except Exception as e:
-        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
+        bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
 def teacher_test_step(message):
@@ -217,7 +217,7 @@ def teacher_test_step(message):
         name = message.text
 
     except Exception as e:
-        bot.reply_to(message, "Произошла какая-то ошибка, я вас не понял")
+        bot.reply_to(message, "Произошла какая-то ошибка, я вас не понял" + str(e))
 
 
 def student_name_step(message):
@@ -267,6 +267,7 @@ def vote_for_best_student(message): #TODO голосовалка
         bot.send_poll(chat_id=chat_id, poll = poll)
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
+
 
 @bot.message_handler(content_types=['contact'])
 def student_phone_step(message):
