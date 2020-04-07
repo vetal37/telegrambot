@@ -59,7 +59,7 @@ def start_command(message):
 
 
 @bot.message_handler(func=lambda message: message.text == "Нет, я не хочу передавать свой телефон"
-                     and message.content_type == 'text')
+                                          and message.content_type == 'text')
 def telephone(message):
     keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=False)
     change_name = types.KeyboardButton(text='Поменять имя')
@@ -70,14 +70,14 @@ def telephone(message):
 
 
 @bot.message_handler(func=lambda message: message.text == "Поменять имя"
-                     and message.content_type == 'text')
+                                          and message.content_type == 'text')
 def new_name(message):
     msg1 = bot.send_message(message.chat.id, text='Ввведите новое имя')
     bot.register_next_step_handler(msg1, student_change_name_step)
 
 
 @bot.message_handler(func=lambda message: message.text == "/test"
-                     and message.content_type == 'text')
+                                          and message.content_type == 'text')
 def test(message):
     try:
         try:
@@ -258,13 +258,13 @@ def student_change_name_step(message):
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
-def vote_for_best_student(message): #TODO голосовалка
+def vote_for_best_student(message):  # TODO голосовалка
     try:
         chat_id = message.chat.id
         poll = types.Poll(question="Кто является самым активным студентом?")
         for i in Student.query.filter(Student.id == str(chat_id)).all():
             poll.add(Student.query.filter(Student.id == str(chat_id)).first().name)
-        bot.send_poll(chat_id=chat_id, poll = poll)
+        bot.send_poll(chat_id=chat_id, poll=poll)
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял')
 
