@@ -104,11 +104,11 @@ def callback_inline(call):
         elif call.data == "delete1":
             teacher_table_delete_step1(call.message)
         elif "delete2" in call.data:
-            teacher_table_delete_step2(call.message)
+            teacher_table_delete_step2(call.data)
         elif call.data == "start test":
             bot.register_next_step_handler(call.message, teacher_start_test_step)
         elif "test_table" in call.data:
-            bot.register_next_step_handler(call.message, teacher_test_step)
+            bot.register_next_step_handler(call.data, teacher_test_step)
 
 
 def teacher_name_step(message):
@@ -191,7 +191,7 @@ def teacher_table_delete_step2(message):
         Tables.query.filter(Tables.list_name == str(text)).delete(synchronize_session=False)
         db.session.commit()
         msg = bot.send_message(chat_id, text='Таблица ' + text + ' удалена')
-        bot.register_next_step_handler(msg, teacher_table_name_step, None, True)
+        teacher_table_name_step(msg, None, True)
     except Exception as e:
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял ' + str(e))
 
