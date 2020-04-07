@@ -201,7 +201,7 @@ def teacher_start_test_step(message):
         db.session.add(table)
         db.session.commit()
         keyboard = types.InlineKeyboardMarkup()
-        query = Tables.query.filter_by(user_id=str(chat_id)).all()
+        query = Tables.query.filter(user_id=str(chat_id)).all()
         #  log:
         print(query)
         for i in query:
