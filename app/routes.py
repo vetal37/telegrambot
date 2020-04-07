@@ -100,7 +100,7 @@ def callback_inline(call):
             msg = bot.send_message(chat_id=call.message.chat.id, text='Представьтесь, пожалуйста')
             bot.register_next_step_handler(msg, student_name_step)
         elif call.data == "link":
-            bot.register_next_step_handler(call.message, teacher_table_link_step)
+            teacher_table_link_step(call.message)
         elif call.data == "delete1":
             teacher_table_delete_step1(call.message)
         elif "delete2" in call.data:
