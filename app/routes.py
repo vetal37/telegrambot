@@ -24,17 +24,17 @@ import re
 # service = googleapiclient.discovery.build('sheets', 'v4', http=httpAuth) # Выбираем работу с таблицами и 4 версию API
 
 
-@app.route('/')
-def webhook():
-    try:
-        bot.remove_webhook()
-        time.sleep(0.4)
-        bot.set_webhook(Config.URL + Config.secret)
-        print("webhook set")
-    except Exception as e:
-        bot.send_message(message.chat.id, text="Ошибка " + str(e))
-        return "Ошибка ", e
-    return "!", 200
+# @app.route('/')
+# def webhook():
+#     try:
+#         bot.remove_webhook()
+#         time.sleep(0.4)
+#         bot.set_webhook(Config.URL + Config.secret)
+#         print("webhook set")
+#     except Exception as e:
+#         bot.send_message(message.chat.id, text="Ошибка " + str(e))
+#         return "Ошибка ", e
+#     return "!", 200
 
 
 @app.route('/{}'.format(Config.secret), methods=["POST"])
@@ -284,6 +284,9 @@ def student_phone_step(message):
         bot.reply_to(message, 'Произошла какая-то ошибка, я вас не понял' + str(e))
 
 
-bot.enable_save_next_step_handlers(delay=0.5)
+bot.enable_save_next_step_handlers(delay=1)
 
 bot.load_next_step_handlers()
+
+# bot.polling(none_stop=True, interval=0.5)
+bot.polling()
